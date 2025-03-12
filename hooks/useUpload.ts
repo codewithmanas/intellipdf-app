@@ -20,6 +20,7 @@ export function useUpload() {
   const [fileId, setFileId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
 
+  // Get the loggedin user
   const { user } = useUser();
 
   const handleUpload = async (file: File) => {
@@ -40,12 +41,12 @@ export function useUpload() {
         const progressInPercent = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
-        console.log("UPLOADING...");
+        // console.log("UPLOADING...");
         setStatus(StatusText.UPLOADING);
         setProgress(progressInPercent);
 
         if(progressInPercent === 100) {
-          console.log("UPLOADED...")
+          // console.log("UPLOADED...")
           setStatus(StatusText.UPLOADED);
         }
 
@@ -57,22 +58,26 @@ export function useUpload() {
 
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-        console.log("SAVING...");
+        // console.log("SAVING...");
         setStatus(StatusText.SAVING);
 
         const userDocRef = doc(db, "intellipdf_users", user.id, "files", fileIdForUploadedFile);
 
+        // setDoc method create or overwrite a single document,
+        // If the document does not exist, it will be created,
+        // If the document does exist, its contents will be overwritten with the newly provided data,
+        // setDoc method does not return any promise
         await setDoc(userDocRef, {
           name: file.name,
           size: file.size,
           type: file.type,
           downloadUrl: downloadURL,
           ref: uploadTask.snapshot.ref.fullPath,
-          createdAt: new Date(),
+          createdAt: new Date(), // TODO: implement server timestamp - `timestamp: serverTimestamp()`
         });
 
 
-        console.log("GENERATING...");
+        // console.log("GENERATING...");
         setStatus(StatusText.GENERATING);
 
         // TODO: Generate AI Embeddings...

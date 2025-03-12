@@ -1,6 +1,5 @@
 import FileUploader from "@/components/FileUploader";
 
-
 const UploadPage = () => {
 
 

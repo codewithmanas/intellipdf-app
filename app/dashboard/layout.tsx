@@ -1,16 +1,17 @@
-import Header from '@/components/Header'
-import React from 'react'
+import Header from "@/components/Header";
+import { ClerkLoaded } from "@clerk/nextjs";
+import React from "react";
 
-const DashboardLayout = ({children}: {children: React.ReactNode}) => {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <ClerkLoaded>
+      <div className="min-h-screen bg-slate-50">
         <Header />
 
-        <main>
-            {children}
-        </main>
-    </div>
-  )
-}
+        <main>{children}</main>
+      </div>
+    </ClerkLoaded>
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;

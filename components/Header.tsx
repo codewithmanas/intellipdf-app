@@ -10,7 +10,6 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href={"/"} className="flex items-center">
-            {/* <Layout className="h-8 w-8 text-blue-600" /> */}
             <Image
               src={"/logo.svg"}
               width={28}
@@ -40,10 +39,8 @@ const Header = () => {
             </Link>
 
             <div className="h-8 w-8 bg-slate-200 rounded-full flex items-center justify-center">
-              {/* <User className="h-5 w-5 text-slate-600" /> */}
               <SignedOut>
                 <SignInButton />
-              {/* <SignUpButton /> */}
               </SignedOut>
 
               <SignedIn>

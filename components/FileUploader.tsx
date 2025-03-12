@@ -12,7 +12,7 @@ const FileUploader = () => {
 
     useEffect(() => {
             if(fileId) {
-                // router.push(`/dashboard/files/${fileId}`);
+                router.push(`/dashboard/file/${fileId}`);
             }
     }, [fileId, router]);
 
@@ -46,7 +46,8 @@ const FileUploader = () => {
     [StatusText.GENERATING]: <HammerIcon className="h-15 w-15 text-blue-500 animate-bounce" />,
 }
 
-  const uploadInProgress = progress != null && progress >= 0 && progress <= 100;
+    // to check progress of file upload
+    const uploadInProgress = progress != null && progress >= 0 && progress <= 100;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
