@@ -1,5 +1,6 @@
 import { ArrowRight, Brain, Check, FileUp, MessageSquare } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -16,9 +17,13 @@ export default function Home() {
 
               <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">Upload your documents and engage with an AI-powered chatbot that understands, summarizes, and answers all your questions instantly.</p>
 
-              <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
-                Get Started <ArrowRight className="w-5 h-5" />
-              </button>
+              <Link
+                href={"/dashboard"}
+                >
+                <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
+                  Get Started <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
             </div>
 
             {/* Feature Cards */}
@@ -102,10 +107,14 @@ export default function Home() {
           Join thousands of users who are already experiencing the future of document interaction with IntelliPDF.
           </p>
 
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
-            {/* Start Free Trial <ArrowRight className="w-5 h-5" /> */}
-            Click here to try <ArrowRight className="w-5 h-5" />
-          </button>
+          <Link
+            href={"/dashboard"}
+            >
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
+              {/* Start Free Trial <ArrowRight className="w-5 h-5" /> */}
+              Start Chatting with PDF <ArrowRight className="w-5 h-5" />
+            </button>   
+          </Link>
 
         </div>
 
