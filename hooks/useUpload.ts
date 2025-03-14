@@ -1,4 +1,5 @@
 "use client";
+import { generateEmbeddings } from "@/actions/generateEmbeddings";
 import { db, storage } from "@/firebase";
 import { useUser } from "@clerk/nextjs";
 import { doc, setDoc } from "firebase/firestore";
@@ -81,6 +82,11 @@ export function useUpload() {
         setStatus(StatusText.GENERATING);
 
         // TODO: Generate AI Embeddings...
+
+        // const tempId = "04873930-93d0-4dfa-b7d8-500fc08fe123";
+        // await generateEmbeddings(tempId);
+
+        await generateEmbeddings(fileIdForUploadedFile);
 
         setFileId(fileIdForUploadedFile);
       }
