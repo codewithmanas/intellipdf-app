@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { adminDb } from "@/firebaseAdmin";
 import PDFViewer from "@/components/PDFViewer";
 import { notFound } from "next/navigation";
+import ChatView from "@/components/ChatView";
 // import { redirect } from "next/navigation";
 
 const ChatToFilePage = async ({
@@ -12,7 +13,7 @@ const ChatToFilePage = async ({
 }) => {
   const { id } = await params;
 
-  auth.protect();
+  // auth.protect();
 
   const { userId, redirectToSignIn} = await auth();
 
@@ -37,22 +38,19 @@ const ChatToFilePage = async ({
       }
 
 
-
   return (
     <div className="p-4 lg:p-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* PDF Viewer Section */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200">
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
             <PDFViewer url={existingDocument?.downloadUrl} />
           </div>
 
-
           {/* Chat Section */}
-          <div className="lg:col-span-1">
-                Chat
+          <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[calc(100vh-200px)] lg:h-auto">
+              <ChatView id={id} />
           </div>
-
 
       </div>
     </div>

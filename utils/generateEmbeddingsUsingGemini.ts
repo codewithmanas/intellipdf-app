@@ -12,7 +12,7 @@ const model = genAI.getGenerativeModel({model: "text-embedding-004"});
 
 
 // Function to generate embeddings
-async function generateEmbedding(text: string) {
+export async function generateEmbedding(text: string) {
     try {
       const response = await model.embedContent({
         content: { role: "user", parts: [{ text }] }, // Correct structure
