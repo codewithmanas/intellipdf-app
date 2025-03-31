@@ -39,7 +39,13 @@ const ChatView = ({ id }: { id: string }) => {
   );
 
   useEffect(() => {
-    if (!snapshot) return;
+    if (!snapshot) {
+
+      console.log("No snapshot found");
+
+      setMessages((prev) => [...prev, placeholderMessage]);
+      return;
+    } 
 
     console.log("Updated Snapshot: ", snapshot.docs);
 
@@ -78,9 +84,9 @@ const ChatView = ({ id }: { id: string }) => {
 
   }, [snapshot]);
 
-  useEffect(() => {
-    setMessages((prev) => [...prev, placeholderMessage]);
-  }, []);
+  // useEffect(() => {
+  //   setMessages((prev) => [...prev, placeholderMessage]);
+  // }, []);
 
   if (!isLoaded) {
     return <div>Loading...</div>;
