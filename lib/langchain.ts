@@ -139,7 +139,6 @@ export async function generateLangchainCompletion(docId: string, question: strin
 
             // create a retriever to search through the vector store
             console.log("----- Creating retriever... -----");
-
             const retriever =  existingVectorStore.asRetriever();
 
             const chatHistory = await fetchMessageFromDB(docId);
@@ -171,19 +170,19 @@ export async function generateLangchainCompletion(docId: string, question: strin
                ["user", "{input}"],
              ])                   
 
-             console.log("--- Creating a document combining chain ---");
+             console.log("--- Creating a history aware combining docs chain ---");
              const historyAwareCombineDocsChain = await createStuffDocumentsChain({
                llm: model,
                prompt: historyAwareRetrievalPrompt
              });                  
 
-             console.log("--- Creating a main retriever chain ---");
+             console.log("--- Creating a main retriever retriever chain ---");
              const conversationalRetrieverChain = await createRetrievalChain({
                  retriever: historyAwareRetrieverChain,
                  combineDocsChain: historyAwareCombineDocsChain,
              })                  
 
-             console.log(" --- Creating a conversation chain ---");
+             console.log(" --- Creating a conversational chain ---");
 
              const reply = await conversationalRetrieverChain.invoke({
                chat_history: chatHistory,
@@ -200,3 +199,54 @@ export async function generateLangchainCompletion(docId: string, question: strin
         // return null;
     }
 }
+
+
+
+// ************ ChatGPT optimize version **************
+// export async function generateLangchainCompletion(docId: string, question: string) {
+//   try {
+//     console.log("Query: ", question);
+
+//     // Load existing vector store
+//     const existingVectorStore = await generateEmbeddingsInPineconeVectorStore(docId);
+//     const retriever = existingVectorStore.asRetriever();
+
+//     // Fetch chat history (limit to last 5 messages)
+//     const chatHistory = await fetchMessageFromDB(docId);
+//     const lastMessages = chatHistory.slice(-5); // Keeps only last 5 exchanges
+
+//     // Retrieve relevant documents from vector store
+//     const docs = await retriever.getRelevantDocuments(question);
+
+//     // Combine document contents
+//     const context = docs.map(doc => doc.pageContent).join("\n");
+
+//     // Create final prompt
+//     const prompt = `
+//       You are an AI assistant answering questions based on a document and past conversation.
+      
+//       Chat History:
+//       ${lastMessages.map(msg => `User: ${msg.text}\nAI: ${msg.text}`).join("\n")}
+
+//       Document Context:
+//       ${context}
+
+//       User: ${question}
+//       AI:
+//     `;
+
+//     // Get response from Google AI model
+//     const response = await model.invoke(prompt);
+
+//     // // Store chat history
+//     // chatHistory.push({ question, response: response.content });
+//     // if (chatHistory.length > 20) chatHistory.shift(); // Limit stored messages
+
+//     console.log("Answer: ", response.content);
+//     return response.content;
+
+//   } catch (error) {
+//     console.log("Error in generateLangchainCompletion: ", error);
+//     throw new Error("Error in generateLangchainCompletion");
+//   }
+// }

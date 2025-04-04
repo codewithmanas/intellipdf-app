@@ -34,7 +34,7 @@ export async function askQuestion(id: string, question: string) {
 
 
         // limit the FREE/PRO users
-        if(userChatCollection.length >= 5) {
+        if(userChatCollection.length >= 10) {
             throw new Error("You have reached the maximum number of questions. Please upgrade to PRO to continue.");
         }
 

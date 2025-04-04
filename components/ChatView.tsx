@@ -6,6 +6,8 @@ import { collection, orderBy, query } from "firebase/firestore";
 import { Loader2Icon, Send } from "lucide-react";
 import React, { useEffect, useState, useTransition } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
+import Markdown from "react-markdown";
+import remarkGfm from 'remark-gfm'
 
 export interface Message {
   id?: string;
@@ -42,6 +44,8 @@ const ChatView = ({ id }: { id: string }) => {
     if (!snapshot) {
 
       console.log("No snapshot found");
+      console.log("loading: ", loading);
+      console.log("error: ", error);
 
       setMessages((prev) => [...prev, placeholderMessage]);
       return;
@@ -179,7 +183,11 @@ const ChatView = ({ id }: { id: string }) => {
                   : ""
               }`}
             >
-              {message.text} <br />{" "}
+              <Markdown remarkPlugins={[remarkGfm]}>
+              {message.text} 
+              </Markdown>
+
+              <br />{" "}
               <small>{message.createdAt.toLocaleString()}</small>
             </p>
           </div>
