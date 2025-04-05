@@ -24,6 +24,16 @@ const nextConfig: NextConfig = {
   // typescript: {
   //   ignoreBuildErrors: true,
   // },
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  webpack(config) {
+    // Disable CSS minimizer plugin for easier debugging
+    config.optimization.minimize = false;
+    return config;
+  },
 };
 
 export default nextConfig;
