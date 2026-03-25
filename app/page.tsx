@@ -19,6 +19,7 @@ export default function Home() {
 
               <Link
                 href={"/dashboard"}
+                className="inline-block"
                 >
                 <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
                   Get Started <ArrowRight className="w-5 h-5" />
@@ -109,6 +110,7 @@ export default function Home() {
 
           <Link
             href={"/dashboard"}
+            className="inline-block"
             >
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
               {/* Start Free Trial <ArrowRight className="w-5 h-5" /> */}
