@@ -40,29 +40,33 @@ export function useUpload() {
       "state_changed",
       (snapshot) => {
         const progressInPercent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
         );
         // console.log("UPLOADING...");
         setStatus(StatusText.UPLOADING);
         setProgress(progressInPercent);
 
-        if(progressInPercent === 100) {
+        if (progressInPercent === 100) {
           // console.log("UPLOADED...")
           setStatus(StatusText.UPLOADED);
         }
-
       },
       (error) => {
         console.error("Error uploading file", error);
       },
       async () => {
-
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
         // console.log("SAVING...");
         setStatus(StatusText.SAVING);
 
-        const userDocRef = doc(db, "intellipdf_users", user.id, "files", fileIdForUploadedFile);
+        const userDocRef = doc(
+          db,
+          "intellipdf_users",
+          user.id,
+          "files",
+          fileIdForUploadedFile,
+        );
 
         // setDoc method create or overwrite a single document,
         // If the document does not exist, it will be created,
@@ -77,7 +81,6 @@ export function useUpload() {
           createdAt: new Date(), // TODO: implement server timestamp - `timestamp: serverTimestamp()`
         });
 
-
         // console.log("GENERATING...");
         setStatus(StatusText.GENERATING);
 
@@ -89,7 +92,7 @@ export function useUpload() {
         await generateEmbeddings(fileIdForUploadedFile);
 
         setFileId(fileIdForUploadedFile);
-      }
+      },
     );
   };
 
