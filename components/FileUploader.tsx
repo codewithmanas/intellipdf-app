@@ -65,6 +65,7 @@ const FileUploader = () => {
           <div
             className={`text-blue-500 ${progress === 100 ? "hidden" : ""}`}
             role="progressbar"
+            aria-label="progressbar"
           >
             {progress} %
           </div>
