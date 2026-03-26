@@ -1,6 +1,14 @@
+
 import React from "react";
 import { auth } from "@clerk/nextjs/server";
-import PDFViewer from "@/components/PDFViewer";
+
+import dynamic from "next/dynamic";
+
+const PDFViewer = dynamic(() => import("@/components/PDFViewer"), {
+  ssr: true,
+});
+
+// import PDFViewer from "@/components/PDFViewer";
 import { notFound } from "next/navigation";
 import ChatView from "@/components/ChatView";
 import { supabase } from "@/lib/supabase";
