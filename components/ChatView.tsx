@@ -1,13 +1,11 @@
 "use client";
+
 import { askQuestion } from "@/actions/askQuestion";
-import { db } from "@/firebase";
 import { useUser } from "@clerk/nextjs";
-import { collection, orderBy, query } from "firebase/firestore";
 import { Loader2Icon, Send } from "lucide-react";
-import React, { useEffect, useState, useTransition } from "react";
-import { useCollection } from "react-firebase-hooks/firestore";
+import React, { useState, useTransition } from "react";
 import Markdown from "react-markdown";
-import remarkGfm from 'remark-gfm'
+import remarkGfm from "remark-gfm";
 
 export interface Message {
   id?: string;
@@ -24,73 +22,12 @@ const placeholderMessage = {
 } as Message;
 
 const ChatView = ({ id }: { id: string }) => {
-  const { isSignedIn, user, isLoaded } = useUser();
+  // const { isSignedIn, user, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
 
-  // console.log("user: ", user)
-
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([placeholderMessage]);
   const [input, setInput] = useState<string>("");
   const [isPending, startTransition] = useTransition();
-
-  const [snapshot, loading, error] = useCollection(
-    user &&
-      query(
-        collection(db, "intellipdf_users", user?.id, "files", id, "chat"),
-        orderBy("createdAt", "asc")
-      )
-  );
-
-  useEffect(() => {
-    if (!snapshot) {
-
-      console.log("No snapshot found");
-      console.log("loading: ", loading);
-      console.log("error: ", error);
-
-      setMessages((prev) => [...prev, placeholderMessage]);
-      return;
-    } 
-
-    console.log("Updated Snapshot: ", snapshot.docs);
-
-    const lastMessage = messages.pop();
-
-    if(lastMessage?.role === "ai" && lastMessage.text === "Thinking...") {
-      return;
-    }
-
-    const newMessages = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        role: data.role,
-        text: data.text,
-        createdAt: data.createdAt.toDate(),
-      };
-    });
-
-
-    // setMessages((prev) => [...prev, ...newMessages]);
-    setMessages(newMessages);
-
-    // setMessages(prev => {
-    //   const newMessages = snapshot.docs.map((doc) => {
-    //     const data = doc.data();
-    //     return {
-    //       id: doc.id,
-    //       role: data.role,
-    //       text: data.text,
-    //       createdAt: data.createdAt.toDate(),
-    //     };
-    //   });
-    //   return [...prev, ...newMessages];
-    // });
-
-  }, [snapshot]);
-
-  // useEffect(() => {
-  //   setMessages((prev) => [...prev, placeholderMessage]);
-  // }, []);
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -100,7 +37,7 @@ const ChatView = ({ id }: { id: string }) => {
     return <div>Sign in to view this page</div>;
   }
 
-  // Function to send message to Firebase DB
+  // Function to send message to DB
   const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -131,28 +68,24 @@ const ChatView = ({ id }: { id: string }) => {
 
     // Ask Question to Langchain
     startTransition(async () => {
-        const { success, message } = await askQuestion(id, q);
+      const { success, message } = await askQuestion(id, q);
 
-        if(!success) {
-          console.log("error: ", message);
+      if (!success) {
+        console.log("error: ", message);
 
-          setMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages];
-            updatedMessages.pop(); // Remove the thinking message
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          updatedMessages.pop(); // Remove the thinking message
 
-            updatedMessages.push({
-              role: "ai",
-              text: `Whoops... ${message}`,
-              createdAt: new Date(),
-            });
-            return updatedMessages;
+          updatedMessages.push({
+            role: "ai",
+            text: `Whoops... ${message}`,
+            createdAt: new Date(),
           });
-
-        }
-
-
+          return updatedMessages;
+        });
+      }
     });
-
   };
 
   return (
@@ -172,7 +105,7 @@ const ChatView = ({ id }: { id: string }) => {
               message.role === "human" ? "justify-end" : "justify-start"
             }`}
           >
-            <p
+            <div
               className={`max-w-[80%] rounded-2xl px-4 py-2 ${
                 message.role === "human"
                   ? "bg-blue-600 text-white"
@@ -183,13 +116,9 @@ const ChatView = ({ id }: { id: string }) => {
                   : ""
               }`}
             >
-              <Markdown remarkPlugins={[remarkGfm]}>
-              {message.text} 
-              </Markdown>
-
-              <br />{" "}
-              <small>{message.createdAt.toLocaleString()}</small>
-            </p>
+              <Markdown remarkPlugins={[remarkGfm]}>{message.text}</Markdown>
+              <br /> <small>{message.createdAt.toLocaleString()}</small>
+            </div>
           </div>
         ))}
       </div>

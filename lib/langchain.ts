@@ -24,7 +24,8 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 
 // Initialize Google's Generative AI LLM (Chat Model)
 export const model = new ChatGoogleGenerativeAI({
-  model: "gemini-1.5-pro", // Use Gemini model for chat
+  // model: "gemini-1.5-pro", // Use Gemini model for chat
+  model: "gemini-2.0-flash", // Use Gemini model for chat
   apiKey: process.env.GOOGLE_GEMINI_API_KEY,
 });
 

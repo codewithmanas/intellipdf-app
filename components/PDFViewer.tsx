@@ -37,14 +37,6 @@ const PDFViewer = ({ url }: { url: string }) => {
     fetchFile();
   }, [url]);
 
-  // We need to configure CORS
-  // gsutil cors set cors.json gs://all-testing-projects-a9a1b.firebasestorage.app
-  // gsutil cors set cors.json gs://all-testing-projects-a9a1b.firebasestorage.app
-  // go here >>> https://console.cloud.google.com/
-  // create new file in editor calls cors.json
-  // run >>> // gsutil cors set cors.json gs://all-testing-projects-a9a1b.firebasestorage.app
-  // https://firebase.google.com/docs/storage/web/download-files#cors_configuration
-
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
   }
@@ -112,6 +104,7 @@ const PDFViewer = ({ url }: { url: string }) => {
 
         <div className="flex items-center space-x-4 ">
           <button
+            aria-label="Previous Page"
             onClick={goToPrevPage}
             disabled={pageNumber <= 1}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
@@ -124,6 +117,7 @@ const PDFViewer = ({ url }: { url: string }) => {
           </span>
 
           <button
+            aria-label="Next Page"
             onClick={goToNextPage}
             disabled={pageNumber >= numPages!}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
