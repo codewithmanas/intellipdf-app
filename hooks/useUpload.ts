@@ -77,6 +77,7 @@ export function useUpload() {
         size: file.size,
         type: file.type,
         path: filePath,
+        doc_id: fileIdForUploadedFile,
         download_url: downloadUrl,
       });
 

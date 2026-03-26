@@ -17,7 +17,8 @@ if(!process.env.GOOGLE_GEMINI_API_KEY) {
 
 // Initialize Google's Generative AI Embeddings
 const embeddings = new GoogleGenerativeAIEmbeddings({
-  modelName: "text-embedding-004", // Use text-embedding-004
+  // modelName: "text-embedding-004", // Use text-embedding-004
+  modelName: "gemini-embedding-001", // Use gemini-embedding-001
   apiKey: process.env.GOOGLE_GEMINI_API_KEY,
 });
 
@@ -105,6 +106,8 @@ export async function generateEmbeddingsInPineconeVectorStore(docId: string) {
                     console.log("splitDocs: ", splitDocs);
 
                     console.log(`--- Storing the embeddings in namespace ${docId} in the ${pineconeIndexName} Pinecone vector store... ---`);
+                    const test = await embeddings.embedQuery("hello world");
+                    console.log("Embedding length:", test.length);
 
                     const newPineconeVectorStore = await PineconeStore.fromDocuments(
                         splitDocs, 
