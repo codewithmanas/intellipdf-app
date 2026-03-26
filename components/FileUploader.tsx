@@ -39,6 +39,7 @@ const FileUploader = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: handleFileAccepted,
     maxFiles: 1,
+    maxSize: 10 * 1024 * 1024,
     accept: {
       "application/pdf": [".pdf"],
     },

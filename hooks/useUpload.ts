@@ -1,9 +1,7 @@
 "use client";
 import { generateEmbeddings } from "@/actions/generateEmbeddings";
-import { db, storage } from "@/firebase";
+import { supabase } from "@/lib/supabase";
 import { useUser } from "@clerk/nextjs";
-import { doc, setDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -29,71 +27,74 @@ export function useUpload() {
 
     // TODO: FREE/PRO Limitations...
 
-    const fileIdForUploadedFile = uuidv4();
-    const docFilePath = `intellipdf_users/${user.id}/files/${fileIdForUploadedFile}`;
+    try {
+      setStatus(StatusText.UPLOADING);
+      setProgress(0);
 
-    const docStorageRef = ref(storage, docFilePath);
+      const fileIdForUploadedFile = uuidv4();
+      const fileName = `${fileIdForUploadedFile}-${file.name}`;
+      const filePath = `uploads/${fileName}`;
 
-    const uploadTask = uploadBytesResumable(docStorageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progressInPercent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-        );
-        // console.log("UPLOADING...");
-        setStatus(StatusText.UPLOADING);
-        setProgress(progressInPercent);
-
-        if (progressInPercent === 100) {
-          // console.log("UPLOADED...")
-          setStatus(StatusText.UPLOADED);
-        }
-      },
-      (error) => {
-        console.error("Error uploading file", error);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-        // console.log("SAVING...");
-        setStatus(StatusText.SAVING);
-
-        const userDocRef = doc(
-          db,
-          "intellipdf_users",
-          user.id,
-          "files",
-          fileIdForUploadedFile,
-        );
-
-        // setDoc method create or overwrite a single document,
-        // If the document does not exist, it will be created,
-        // If the document does exist, its contents will be overwritten with the newly provided data,
-        // setDoc method does not return any promise
-        await setDoc(userDocRef, {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          downloadUrl: downloadURL,
-          ref: uploadTask.snapshot.ref.fullPath,
-          createdAt: new Date(), // TODO: implement server timestamp - `timestamp: serverTimestamp()`
+      const { error: uploadError } = await supabase.storage
+        .from("intellipdf-files")
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: file.type,
         });
 
-        // console.log("GENERATING...");
-        setStatus(StatusText.GENERATING);
+      if (uploadError) {
+        throw uploadError;
+      }
 
-        // TODO: Generate AI Embeddings...
+      setProgress(100);
+      setStatus(StatusText.UPLOADED);
 
-        // const tempId = "04873930-93d0-4dfa-b7d8-500fc08fe123";
-        // await generateEmbeddings(tempId);
+      // small delay (important)
+      await new Promise((res) => setTimeout(res, 200));
 
-        await generateEmbeddings(fileIdForUploadedFile);
+      const { data: fileData, error: fileDataError } = await supabase.storage
+        .from("intellipdf-files")
+        .createSignedUrl(filePath, 60 * 60);
 
-        setFileId(fileIdForUploadedFile);
-      },
-    );
+      if (fileDataError) {
+        console.error("Signed URL error:", fileDataError);
+        // throw fileDataError;
+      }
+
+      if (!fileData?.signedUrl) {
+        console.error("Failed to generate signed URL");
+        // throw new Error("Failed to generate signed URL");
+      }
+
+      const downloadUrl = fileData?.signedUrl;
+
+      // Save to DB
+      setStatus(StatusText.SAVING);
+
+      const { error: dbError } = await supabase.from("files").insert({
+        user_id: user.id,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        path: filePath,
+        doc_id: fileIdForUploadedFile,
+        download_url: downloadUrl,
+      });
+
+      if (dbError) {
+        console.error("Database error:", dbError);
+        throw dbError;
+      }
+
+      setStatus(StatusText.GENERATING);
+      await generateEmbeddings(fileIdForUploadedFile);
+
+      setFileId(fileIdForUploadedFile);
+    } catch (error) {
+      console.error("File upload failed:", error);
+      setStatus(null);
+      setProgress(null);
+    }
   };
 
   return { progress, fileId, status, handleUpload };
